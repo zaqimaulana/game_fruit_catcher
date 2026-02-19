@@ -1,6 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import '../audio_manager.dart';
+import '../managers/audio_manager.dart';
 
 class FruitCatcherGame extends FlameGame {
 
