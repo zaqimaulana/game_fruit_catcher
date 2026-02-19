@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'game/fruit_catcher_game.dart';
+import 'audio_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await AudioManager().initialize();
+
   runApp(const MyApp());
 }
 
@@ -12,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: GameScreen(),
     );
   }
@@ -27,7 +33,6 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
 
   late FruitCatcherGame game;
-  final ValueNotifier<int> counter = ValueNotifier(1);
 
   @override
   void initState() {
@@ -36,11 +41,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   @override
+  void dispose() {
+    game.onRemove();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          GameWidget(game: game),  
+          GameWidget(game: game),
           Positioned(
             top: 50,
             left: 20,
@@ -51,7 +62,7 @@ class _GameScreenState extends State<GameScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: ValueListenableBuilder<int>(
-                valueListenable: counter,
+                valueListenable: game.scoreNotifier,
                 builder: (context, score, child) {
                   return Text(
                     'Score: $score',
@@ -72,12 +83,16 @@ class _GameScreenState extends State<GameScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.music_note),
-                  onPressed: () {},
+                  icon: const Icon(Icons.music_note, color: Colors.black),
+                  onPressed: () {
+                    AudioManager().toggleMusic();
+                  },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.volume_up),
-                  onPressed: () {},
+                  icon: const Icon(Icons.volume_up, color: Colors.black),
+                  onPressed: () {
+                    AudioManager().toggleSfx();
+                  },
                 ),
               ],
             ),
